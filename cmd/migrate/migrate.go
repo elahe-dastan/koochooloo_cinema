@@ -3,11 +3,13 @@ package migrate
 import (
 	"koochooloo_cinema/db"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 	"github.com/spf13/cobra"
 )
-
-const enable = 1
 
 func main() {
 	database, err := db.New()
@@ -15,7 +17,16 @@ func main() {
 		log.Fatal("database initiation failed", err)
 	}
 
-
+	driver, err := postgres.WithInstance(database, &postgres.Config{})
+	m, err := migrate.NewWithDatabaseInstance(
+		"file:///migration",
+		"postgres", driver)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	if err = m.Steps(2); err != nil {
+		log.Fatalf(err.Error())
+	}
 }
 
 // Register migrate command.
