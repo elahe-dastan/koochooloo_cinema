@@ -39,7 +39,10 @@ func (s *Special) Update(c echo.Context) error {
 	}
 
 	// todo set special at
-	_, err = tx.Exec( "UPDATE registeration SET credit = credit + 1 WHERE username = ?", username)
+	//د. در صورت وجود رکورد مرتبط به کاربر در جدول کاربران ویژه،
+	//اگر زمان اشتراک کاربر تمام شده، تا یک ماه بعد تمدید شود و در صورت وجود اشتراک، زمان اشتراک کاربر به
+	//مدت 1 ماه اضافه شود.
+		_, err = tx.Exec( "UPDATE registeration SET credit = credit + 1 WHERE username = ?", username)
 	if err != nil {
 		tx.Rollback()
 		return err
