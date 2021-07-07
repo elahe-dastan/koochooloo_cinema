@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
+	"koochooloo_cinema/model"
 )
 
 type Vote struct {
@@ -33,4 +35,24 @@ func (v *Vote) Create(c echo.Context) error {
 
 	// todo return object
 	return c.NoContent(http.StatusOK)
+}
+
+func (v *Vote) Retrieve(c echo.Context) error {
+	film := c.QueryParam("film")
+
+	var votes model.Vote
+
+	// todo user is keyword?
+	//todo what if update
+	rows, err := v.Store.Query("SELECT * FROM vote WHERE film = ?", film)
+	if err != nil {
+		return err
+	}
+
+	if err = rows.Scan(votes); err != nil {
+		return err
+	}
+
+	// todo return object
+	return c.JSON(http.StatusOK, votes)
 }
