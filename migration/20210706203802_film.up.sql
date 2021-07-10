@@ -6,5 +6,6 @@ CREATE TABLE film
     producers       varchar(255),
     production_year int,
     explanation     varchar(255),
-    view            int default 0
+    view            int default 0,
+    price           int DEFAULT 0
 )

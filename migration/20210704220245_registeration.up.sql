@@ -9,6 +9,7 @@ CREATE TABLE registration
     national_number varchar(10),
     special_at      timestamp,
     credit          int default 0,
+    score           int default 0,
     CONSTRAINT CHK_Password CHECK ( LENGTH(password) >= 8 AND  password LIKE '%[0-9]%' AND password LIKE '%[A-Z]%' AND password LIKE '%[a-z]%')
 );
 
