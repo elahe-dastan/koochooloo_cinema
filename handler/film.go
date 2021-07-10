@@ -78,3 +78,15 @@ func (f *Film) RetrieveByProducer(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, films)
 }
+
+func (f *Film) Watch(c echo.Context) error {
+	film := c.Param("film_id")
+	user := c.Param("user_id")
+
+	_, err := f.Store.Exec("INSERT INTO watch VALUES (?, ?)", film, user)
+	if err != nil {
+		return err // increase by one
+	}
+
+	return c.NoContent(http.StatusOK)
+}
