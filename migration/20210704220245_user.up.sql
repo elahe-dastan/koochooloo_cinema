@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user
+CREATE TABLE IF NOT EXISTS users
 (
     username        varchar(255) primary key,
     password        varchar(255),
@@ -12,4 +12,10 @@ CREATE TABLE IF NOT EXISTS user
     CONSTRAINT CHK_Password CHECK ( LENGTH(password) >= 8 AND  password LIKE '%[0-9]%' AND password LIKE '%[A-Z]%' AND password LIKE '%[a-z]%')
 );
 
-CREATE UNIQUE INDEX uidx_email ON user(email);
+CREATE UNIQUE INDEX uidx_email ON users(email);
+
+# CREATE TRIGGER create_wallet
+#     AFTER INSERT
+#     ON users
+#     FOR EACH ROW
+#     INSERT INTO wallet (username) VALUES (users.username);

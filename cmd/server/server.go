@@ -20,9 +20,10 @@ func main() {
 		log.Fatal("database initiation failed", err)
 	}
 
-	handler.SignUp{
+	signup := handler.SignUp{
 		Store: database,
-	}.Register(app.Group("/api"))
+	}
+	signup.Register(app.Group("/api"))
 
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
@@ -34,7 +35,7 @@ func Register(root *cobra.Command) {
 	root.AddCommand(
 		// nolint: exhaustivestruct
 		&cobra.Command{
-			Use:   "server",
+			Use:   "serve",
 			Short: "Run server to serve the requests",
 			Run: func(cmd *cobra.Command, args []string) {
 				main()

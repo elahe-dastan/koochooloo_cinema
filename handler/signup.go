@@ -16,8 +16,6 @@ type SignUp struct {
 	Store *sql.DB
 }
 
-// Create generates short URL and save it on database.
-// nolint: wrapcheck
 func (s *SignUp) Create(c echo.Context) error {
 	var rq request.Signup
 
@@ -25,21 +23,26 @@ func (s *SignUp) Create(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	//todo
-	//Username       string `json:"username"`
-	//Password       string `json:"password"`
-	//FirstName      string `json:"first_name"`
-	//LastName       string `json:"last_name"`
-	//Email          string `json:"email"`
-	//Phone          string `json:"phone"`
-	//NationalNumber string `json:"national_number"`
-	// todo trigger to insert into wallet
-	if _, err := s.Store.Exec("INSERT INTO registration VALUES (?, ?)", rq.Username, rq.Password); err != nil {
+	tx, err := s.Store.Begin()
+	if err != nil {
 		return err
 	}
 
-	// todo return object
-	return c.NoContent(http.StatusOK)
+	if _, err = s.Store.Exec("INSERT INTO users (username, password, first_name, last_name, email, phone, national_number) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		rq.Username, rq.Password, rq.FirstName, rq.LastName, rq.Email, rq.Phone, rq.NationalNumber); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO wallet (username) VALUES (?)", rq.Username)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+
+	return c.NoContent(http.StatusCreated)
 }
 
 // Retrieve retrieves URL for given short URL and redirect to it.
