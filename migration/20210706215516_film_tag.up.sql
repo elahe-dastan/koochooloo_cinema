@@ -1,5 +1,7 @@
-CREATE TABLE film
+CREATE TABLE film_tag
 (
-    id  int,
-    tag varchar(255)
+    film  int,
+    tag varchar(255),
+    primary key (film, tag),
+    FOREIGN KEY (film) REFERENCES film (id)
 )

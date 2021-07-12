@@ -1,4 +1,4 @@
-CREATE TABLE registration
+CREATE TABLE IF NOT EXISTS user
 (
     username        varchar(255) primary key,
     password        varchar(255),
@@ -7,10 +7,9 @@ CREATE TABLE registration
     email           varchar(255),
     phone           varchar(13),
     national_number varchar(10),
-    special_at      timestamp,
-    credit          int default 0,
+    special_till      timestamp,
     score           int default 0,
     CONSTRAINT CHK_Password CHECK ( LENGTH(password) >= 8 AND  password LIKE '%[0-9]%' AND password LIKE '%[A-Z]%' AND password LIKE '%[a-z]%')
 );
 
-CREATE UNIQUE INDEX uidx_email ON registration (email);
+CREATE UNIQUE INDEX uidx_email ON user(email);
