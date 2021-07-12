@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS users
 (
     username        varchar(255) primary key,
     password        varchar(255),
-    firs_name       varchar(255),
+    first_name       varchar(255),
     last_name       varchar(255),
     email           varchar(255),
     phone           varchar(13),

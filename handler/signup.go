@@ -28,13 +28,17 @@ func (s *SignUp) Create(c echo.Context) error {
 		return err
 	}
 
-	if _, err = s.Store.Exec("INSERT INTO users (username, password, first_name, last_name, email, phone, national_number) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		rq.Username, rq.Password, rq.FirstName, rq.LastName, rq.Email, rq.Phone, rq.NationalNumber); err != nil {
+	// todo remove the fmt.Sprintf
+	query := fmt.Sprintf("INSERT INTO users (username, password, first_name, last_name, email, phone, national_number) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+		rq.Username, rq.Password, rq.FirstName, rq.LastName, rq.Email, rq.Phone, rq.NationalNumber)
+	if _, err = s.Store.Exec(query); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	_, err = tx.Exec("INSERT INTO wallet (username) VALUES (?)", rq.Username)
+	// todo what is the error (is the username taken?)
+	query = fmt.Sprintf("INSERT INTO wallet (username) VALUES ('%s')", rq.Username)
+	_, err = tx.Exec(query)
 	if err != nil {
 		tx.Rollback()
 		return err
