@@ -25,6 +25,11 @@ func main() {
 	}
 	signup.Register(app.Group("/api"))
 
+	wallet := handler.Wallet{
+		Store: database,
+	}
+	wallet.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}
