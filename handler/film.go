@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/model"
+	"koochooloo_cinema/request"
 )
 
 type Film struct {
@@ -28,7 +28,7 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	var films []model.Film
+	var films []request.Film
 	rows, err := f.Store.Query("SELECT * FROM film WHERE tag = ? ORDER BY ? LIMIT ? OFFSET ? ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -47,7 +47,7 @@ func (f *Film) RetrieveByName(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	var films []model.Film
+	var films []request.Film
 	rows, err := f.Store.Query("SELECT * FROM film WHERE tag = ? ORDER BY ? DESC LIMIT ? OFFSET ? ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -66,7 +66,7 @@ func (f *Film) RetrieveByProducer(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	var films []model.Film
+	var films []request.Film
 	rows, err := f.Store.Query("SELECT * FROM film WHERE tag = ? ORDER BY ? LIMIT ? OFFSET ? ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())

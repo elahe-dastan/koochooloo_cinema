@@ -35,6 +35,11 @@ func main() {
 	}
 	special.Register(app.Group("/api"))
 
+	admin := handler.Admin{
+		Store: database,
+	}
+	admin.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}

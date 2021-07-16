@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"koochooloo_cinema/model"
 	"koochooloo_cinema/request"
 
 	"github.com/labstack/echo/v4"
@@ -55,7 +54,7 @@ func (s *SignUp) Create(c echo.Context) error {
 func (s *SignUp) Retrieve(c echo.Context) error {
 	username := c.Param("username")
 
-	user := model.User{}
+	user := request.Signup{}
 	err := s.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())

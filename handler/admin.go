@@ -8,9 +8,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/model"
+	"koochooloo_cinema/request"
 )
 
+// todo
 const (
 	username = "admin"
 	password = "admin"
@@ -20,18 +21,63 @@ type Admin struct {
 	Store *sql.DB
 }
 
-// Create generates short URL and save it on database.
-// nolint: wrapcheck
 func (a *Admin) Create(c echo.Context) error {
-	var film model.Film
+	var film request.Film
 
 	if err := c.Bind(&film); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	//todo others
-	if _, err := a.Store.Exec("INSERT INTO film VALUES (?, ?)", film.File, film.Explanation); err != nil {
+	tx, err := a.Store.Begin()
+	if err != nil {
 		return err
+	}
+
+	id := 0
+	query := fmt.Sprintf("INSERT INTO film (file,  name, production_year, explanation, price) VALUES ('%s', '%s', %d, '%s', %d) RETURNING id",
+		film.File, film.Name, film.ProductionYear, film.Explanation, film.Price)
+	err = a.Store.QueryRow(query).Scan(&id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// todo this is so bad
+	if film.View != 0 {
+		query = fmt.Sprintf("UPDATE film SET view = %d WHERE id = %d",film.View, id)
+		_, err = a.Store.Exec(query)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+	}
+
+	// todo this is so bad
+	if film.Price != 0 {
+		query = fmt.Sprintf("UPDATE film SET price = %d WHERE id = %d",film.Price, id)
+		_, err = a.Store.Exec(query)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+	}
+
+	for _, producer := range film.Producers {
+		query = fmt.Sprintf("INSERT INTO film_producer (film, producer) VALUES ('%d', '%s')", id, producer)
+		if _, err = a.Store.Exec(query); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	for _, tag := range film.Tags {
+		query = fmt.Sprintf("INSERT INTO film_tag (film, tag) VALUES ('%d', '%s')", id, tag)
+		if _, err = a.Store.Exec(query); err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	// todo return object
@@ -44,7 +90,7 @@ func (a *Admin) Create(c echo.Context) error {
 func (a *Admin) Retrieve(c echo.Context) error {
 	username := c.Param("username")
 
-	user := model.User{}
+	user := request.Signup{}
 	err := a.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -56,7 +102,7 @@ func (a *Admin) Retrieve(c echo.Context) error {
 func (a *Admin) Update(c echo.Context) error {
 	username := c.Param("username")
 
-	body := model.User{}
+	body := request.Signup{}
 	err := c.Bind(&body)
 	if err != nil {
 		return err
@@ -135,6 +181,6 @@ func (a *Admin) Delete(c echo.Context) error {
 // Register registers the routes of URL handler on given group.
 func (a *Admin) Register(g *echo.Group) {
 	g.GET("/:username", a.Retrieve)
-	g.POST("/signup", a.Create)
+	g.POST("/admin", a.Create)
 	//g.GET("/count/:key", h.Count)
 }

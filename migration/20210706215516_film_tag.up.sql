@@ -1,4 +1,4 @@
-CREATE TABLE film_tag
+CREATE TABLE IF NOT EXISTS film_tag
 (
     film  int,
     tag varchar(255),

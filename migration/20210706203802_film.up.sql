@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS film
 (
-    id              int primary key auto_increment,
+    id              SERIAL primary key,
     file            varchar(255),
     name            varchar(255),
     production_year int,
