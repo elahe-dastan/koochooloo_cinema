@@ -16,9 +16,10 @@ type SignUp struct {
 	Store *sql.DB
 }
 
+// todo password constraint doesn't work
+// todo unique constraint on email doesn't work
 func (s *SignUp) Create(c echo.Context) error {
 	var rq request.Signup
-
 	if err := c.Bind(&rq); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -64,83 +65,64 @@ func (s *SignUp) Retrieve(c echo.Context) error {
 }
 
 func (s *SignUp) Update(c echo.Context) error {
-	username := c.Param("username")
-
-	body := model.User{}
-	err := c.Bind(&body)
-	if err != nil {
-		return err
+	var rq request.Signup
+	if err := c.Bind(&rq); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	query := "UPDATE registeration SET "
+	query := "UPDATE users SET "
 
 	columns := make(map[string]string)
 
-	if body.Username != "" {
-		columns["username"] = body.Username
+	if rq.Password != "" {
+		columns["password"] = rq.Password
 	}
 
-	if body.Password != "" {
-		columns["password"] = body.Password
+	if rq.FirstName != "" {
+		columns["first_name"] = rq.FirstName
 	}
 
-	if body.FirstName != "" {
-		columns["first_name"] = body.FirstName
+	if rq.LastName != "" {
+		columns["last_name"] = rq.LastName
 	}
 
-	if body.LastName != "" {
-		columns["last_name"] = body.LastName
+	if rq.Email != "" {
+		columns["email"] = rq.Email
 	}
 
-	if body.Email != "" {
-		columns["email"] = body.Email
+	if rq.Phone != "" {
+		columns["phone"] = rq.Phone
 	}
 
-	if body.Phone != "" {
-		columns["phone"] = body.Phone
-	}
-
-	if body.NationalNumber != "" {
-		columns["national_number"] = body.NationalNumber
+	if rq.NationalNumber != "" {
+		columns["national_number"] = rq.NationalNumber
 	}
 
 	for k, v := range columns {
-		query += k + " = " + v + ", "
+		query += k + " = '" + v + "', "
 	}
 
-	query = strings.Trim(query, ",")
+	query = strings.Trim(query, ", ")
 
-	query += fmt.Sprintf("WHERE username = %s", username)
+	query += fmt.Sprintf(" WHERE username = '%s'", rq.Username)
 
-	_, err = s.Store.Query(query)
+	_, err := s.Store.Exec(query)
 	if err != nil {
 		return err
 	}
 
+	// todo
 	//if result.RowsAffected == 0 {
 	//	return ctx.JSON(http.StatusNotFound, DriverSignupError{Message: "referrer not found"})
 	//}
 
-	//return ctx.JSON(http.StatusOK, &ReferrerResponse{
-	//	Name:            referrer.Name,
-	//	Code:            referrer.Code,
-	//	CreatedAt:       referrer.CreatedAt,
-	//	UpdatedAt:       referrer.UpdatedAt,
-	//	Status:          status,
-	//	UploadPermitted: &referrer.UploadPermitted,
-	//	Email:           referrer.Email,
-	//	Cellphone:       referrer.Cellphone,
-	//})
-
 	return c.NoContent(http.StatusOK)
-	// todo
-	//تغییر موجودی حساب کاربری و نام کاربری نباید
-	//در این قسمت امکان پذیر باشد و در صورت تغییر باید تمام تغییرات rollback شوند
 }
 
 // Register registers the routes of URL handler on given group.
 func (s *SignUp) Register(g *echo.Group) {
 	g.GET("/:username", s.Retrieve)
 	g.POST("/signup", s.Create)
+	g.POST("/edit", s.Update)
 	//g.GET("/count/:key", h.Count)
 }
