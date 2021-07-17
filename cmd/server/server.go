@@ -60,6 +60,11 @@ func main() {
 	}
 	favorite.Register(app.Group("/api"))
 
+	follow := handler.Follow{
+		Store: database,
+	}
+	follow.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}
