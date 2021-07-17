@@ -40,6 +40,11 @@ func main() {
 	}
 	admin.Register(app.Group("/api"))
 
+	film := handler.Film{
+		Store: database,
+	}
+	film.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}
