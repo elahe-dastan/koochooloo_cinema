@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS vote
 (
-    user    varchar(255),
+    username    varchar(255),
     film    int,
     score   int,
     comment varchar(255),
-    primary key (user, film),
-    FOREIGN KEY (user) REFERENCES user (username),
+    primary key (username, film),
+    FOREIGN KEY (username) REFERENCES users (username),
     FOREIGN KEY (film) REFERENCES film (id)
 );
 

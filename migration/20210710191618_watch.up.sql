@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS watch
 (
     film int,
-    user varchar(255),
+    username varchar(255),
     number int,
-    PRIMARY KEY (film, user),
+    PRIMARY KEY (film, username),
     FOREIGN KEY (film) REFERENCES film (id),
-    FOREIGN KEY (user) REFERENCES user (username)
+    FOREIGN KEY (username) REFERENCES users (username)
 )
 

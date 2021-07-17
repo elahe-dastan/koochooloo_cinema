@@ -45,6 +45,11 @@ func main() {
 	}
 	film.Register(app.Group("/api"))
 
+	vote := handler.Vote{
+		Store: database,
+	}
+	vote.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}

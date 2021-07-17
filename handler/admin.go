@@ -13,8 +13,8 @@ import (
 
 // todo
 const (
-	username = "admin"
-	password = "admin"
+	//username = "admin"
+	//password = "admin"
 )
 
 type Admin struct {
