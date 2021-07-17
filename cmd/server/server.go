@@ -55,6 +55,11 @@ func main() {
 	}
 	introduction.Register(app.Group("/api"))
 
+	favorite := handler.Favorite{
+		Store: database,
+	}
+	favorite.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}
