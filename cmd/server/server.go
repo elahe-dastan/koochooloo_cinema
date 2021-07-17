@@ -50,6 +50,11 @@ func main() {
 	}
 	vote.Register(app.Group("/api"))
 
+	introduction := handler.Introduction{
+		Store: database,
+	}
+	introduction.Register(app.Group("/api"))
+
 	if err = app.Start(":1373"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal("echo initiation failed", err)
 	}

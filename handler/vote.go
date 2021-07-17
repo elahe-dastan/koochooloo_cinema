@@ -8,7 +8,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/model"
 	"koochooloo_cinema/request"
 )
 
@@ -66,7 +65,7 @@ func (v *Vote) Create(c echo.Context) error {
 func (v *Vote) Retrieve(c echo.Context) error {
 	film := c.QueryParam("film")
 
-	var votes model.Vote
+	var votes request.Vote
 
 	// todo user is keyword?
 	//todo what if update
