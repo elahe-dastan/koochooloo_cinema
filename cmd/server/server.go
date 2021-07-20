@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
 
@@ -14,6 +15,7 @@ import (
 
 func main() {
 	app := echo.New()
+	app.Use(middleware.CORS())
 
 	database, err := db.New()
 	if err != nil {

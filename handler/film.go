@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"koochooloo_cinema/response"
 	"koochooloo_cinema/request"
 )
 
@@ -39,7 +40,7 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 		filmReq.Ordering = "id"
 	}
 
-	var films []request.Film
+	var films []response.Film
 	query := fmt.Sprintf("SELECT * FROM film JOIN film_tag ON film.id = film_tag.film WHERE tag = '%s' ORDER BY %s LIMIT %d OFFSET %d ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
 	rows, err := f.Store.Query(query)
 	if err != nil {
@@ -47,13 +48,12 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var ignoreInt64 int64
 	var ignoreInt int
 	var ignoreString string
 	for rows.Next() {
-		var film request.Film
+		var film response.Film
 		// todo what about producers and tags need join
-		if err = rows.Scan(&ignoreInt64, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &ignoreInt, &ignoreString); err != nil {
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &ignoreInt, &ignoreString); err != nil {
 			panic(err)
 		}
 		films = append(films, film)
