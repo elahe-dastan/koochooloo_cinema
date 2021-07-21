@@ -17,6 +17,6 @@ BEGIN
   RETURN NULL;
 END;
 $$
-LANGUAGE 'plpsql';
+LANGUAGE 'plpgsql';
 
 CREATE TRIGGER favorite_create BEFORE INSERT on favorite FOR EACH ROW EXECUTE PROCEDURE special_user_validation();

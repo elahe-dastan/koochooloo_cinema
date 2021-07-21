@@ -9,20 +9,18 @@ CREATE TABLE IF NOT EXISTS vote
     FOREIGN KEY (film) REFERENCES film (id)
 );
 
-CREATE TRIGGER watch_before_vote
-    BEFORE
-        INSERT
-    ON vote
-    for each row
+CREATE OR REPLACE FUNCTION watch_before_vote() RETURNS trigger as
+$$
+  BEGIN
     IF Not EXISTS(SELECT *
-                  FROM watch
-                  WHERE film_id = film
-                    AND user_id = user)
-BEGIN
-    RAISERROR
-    ("You havn't watche this film")
-ROLLBACK
-    END
+                FROM watch
+                WHERE film = NEW.film
+                  AND username = NEW.username) THEN
+      RETURN NULL;
+    END IF;
+      RETURN NEW;
+  END;
+$$
+LANGUAGE 'plpgsql';
 
-
-#     for each row is wrong
+CREATE TRIGGER vote_create BEFORE INSERT on vote FOR EACH ROW EXECUTE PROCEDURE watch_before_vote();

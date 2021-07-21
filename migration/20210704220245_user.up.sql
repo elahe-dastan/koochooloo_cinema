@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS users
   phone           varchar(13),
   national_number varchar(10),
   special_till    date,
-  score           int default 0,
-  CONSTRAINT CHK_Password CHECK ( LENGTH(password) >= 8 AND  password LIKE '%[0-9]%' AND password LIKE '%[A-Z]%' AND password LIKE '%[a-z]%')
+  score           int default 0
+  /*CONSTRAINT CHK_Password CHECK ( (LENGTH(password) >= 8) AND (password LIKE '%[0-9]%') AND (password LIKE '%[A-Z]%') AND (password LIKE '%[a-z]%') )*/
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uidx_email ON users(email);
