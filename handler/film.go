@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/response"
 	"koochooloo_cinema/request"
+	"koochooloo_cinema/response"
 )
 
 type Film struct {
@@ -16,9 +17,9 @@ type Film struct {
 }
 
 type FilmRequest struct {
-	Tag   string `query:"tag"`
-	Limit int    `query:"name"`
-	Page  int    `query:"producer"`
+	Tag      string `query:"tag"`
+	Limit    int    `query:"name"`
+	Page     int    `query:"producer"`
 	Ordering string `query:"ordering"`
 }
 
@@ -63,6 +64,28 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, films)
+}
+
+func (f *Film) RetrieveById(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("SELECT * FROM film WHERE id = %d ;", id)
+	row := f.Store.QueryRow(query)
+
+	var film response.Film
+	// todo what about producers and tags need join
+	if err = row.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price); err != nil {
+		panic(err)
+	}
+
+	if err = row.Err(); err != nil {
+		panic(err)
+	}
+
+	return c.JSON(http.StatusOK, film)
 }
 
 func (f *Film) RetrieveByName(c echo.Context) error {
@@ -118,6 +141,7 @@ func (f *Film) Watch(c echo.Context) error {
 // Register registers the routes of URL handler on given group.
 func (f *Film) Register(g *echo.Group) {
 	g.GET("/tag", f.RetrieveByTag)
+	g.GET("/film/:id", f.RetrieveById)
 	//g.POST("/signup", f.Create)
 	//g.POST("/edit", f.Update)
 	//g.GET("/count/:key", h.Count)
