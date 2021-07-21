@@ -10,7 +10,7 @@ psql --host=database --username=<username> --dbname=<dbname>
 ```
 
 ```sh
- curl -X POST http://127.0.0.1:1373/api/signup -H 'Content-Type: application/json' -d '{        2:13AM Linux 5.13.4-arch1-1
+curl -X POST http://127.0.0.1:1373/api/signup -H 'Content-Type: application/json' -d '{
   "username": "1995parham",
   "password": "Parham123123",
   "first_name": "Parham",
@@ -18,5 +18,18 @@ psql --host=database --username=<username> --dbname=<dbname>
   "email": "parham.alvani@gmail.com",
   "phone": "09390909540",
   "national_number": "0017784646"
+}'
+```
+
+```sh
+curl -X POST http://127.0.0.1:1373/api/admin -H 'Content-Type: application/json' -d '{
+  "file": "file",
+  "name": "The Movie",
+  "producers": [ "awesome" ],
+  "production_year": 2021,
+  "explanation": "awesome",
+  "view": 100,
+  "price": 100,
+  "tags": [ "t1" ]
 }'
 ```
