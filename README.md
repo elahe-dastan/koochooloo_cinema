@@ -47,3 +47,10 @@ curl -X POST http://127.0.0.1:1373/api/special/wallet -H 'Content-Type: applicat
   "username": "1995parham"
 }'
 ```
+
+```sh
+curl -X POST http://127.0.0.1:1373/api/wallet -H 'Content-Type: application/json' -d '{
+  "username": "1995parham",
+  "credit": 10000
+}'
+```
