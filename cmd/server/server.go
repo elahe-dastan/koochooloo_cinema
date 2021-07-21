@@ -4,13 +4,13 @@ import (
 	"errors"
 	"net/http"
 
+	"koochooloo_cinema/db"
+	"koochooloo_cinema/handler"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
-
-	"koochooloo_cinema/db"
-	"koochooloo_cinema/handler"
 )
 
 func main() {
