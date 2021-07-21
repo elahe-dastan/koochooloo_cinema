@@ -33,3 +33,17 @@ curl -X POST http://127.0.0.1:1373/api/admin -H 'Content-Type: application/json'
   "tags": [ "t1" ]
 }'
 ```
+
+```sh
+curl -X POST http://127.0.0.1:1373/api/favorite -H 'Content-Type: application/json' -d '{
+  "username": "1995parham",
+  "film": [ 1 ],
+  "album": "the album"
+}'
+```
+
+```sh
+curl -X POST http://127.0.0.1:1373/api/special/wallet -H 'Content-Type: application/json' -d '{
+  "username": "1995parham"
+}'
+```
