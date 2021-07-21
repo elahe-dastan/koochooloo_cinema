@@ -59,7 +59,7 @@ func (s *Special) UpdateByWallet(c echo.Context) error {
 	//fmt.Println(specialTill.Location())
 	//fmt.Println(time.Now().Location())
 	fmt.Println(specialTill)
-	if specialTill == nil ||specialTill.Before(time.Now()) {
+	if specialTill == nil || specialTill.Before(time.Now()) {
 		t := time.Now()
 		specialTill = &t
 	}
