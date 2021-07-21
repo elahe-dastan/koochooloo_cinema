@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	if err = m.Steps(2); err != nil {
+	if err = m.Up(); err != nil {
 		log.Fatalf(err.Error())
 	}
 }
