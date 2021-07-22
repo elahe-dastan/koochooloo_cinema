@@ -1,5 +1,16 @@
 #!/bin/bash
 
+echo "create 1995parham with invalid password"
+curl -X POST http://127.0.0.1:1373/api/signup -H 'Content-Type: application/json' -d '{
+  "username": "1995parham",
+  "password": "123123",
+  "first_name": "Parham",
+  "last_name": "Alvani",
+  "email": "parham.alvani@gmail.com",
+  "phone": "09390909540",
+  "national_number": "0017784646"
+}'
+
 echo "create 1995parham"
 curl -X POST http://127.0.0.1:1373/api/signup -H 'Content-Type: application/json' -d '{
   "username": "1995parham",

@@ -26,26 +26,26 @@ func (s *SignUp) Create(c echo.Context) error {
 
 	tx, err := s.Store.Begin()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	// todo remove the fmt.Sprintf
 	query := fmt.Sprintf("INSERT INTO users (username, password, first_name, last_name, email, phone, national_number) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 		rq.Username, rq.Password, rq.FirstName, rq.LastName, rq.Email, rq.Phone, rq.NationalNumber)
 	if _, err = s.Store.Exec(query); err != nil {
 		tx.Rollback()
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	// todo what is the error (is the username taken?)
 	query = fmt.Sprintf("INSERT INTO wallet (username) VALUES ('%s')", rq.Username)
 	_, err = tx.Exec(query)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
 
 	return c.NoContent(http.StatusCreated)
 }
