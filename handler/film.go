@@ -58,7 +58,7 @@ func (f *Film) Retrieve(c echo.Context) error {
 	for rows.Next() {
 		var film response.Film
 		// todo what about producers and tags need join
-		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &ignoreInt, &film.Tags, &ignoreInt, &film.Producers); err != nil {
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &ignoreInt, &film.Tags, &ignoreInt, &film.Producers, &film.Score); err != nil {
 			panic(err)
 		}
 		films = append(films, film)
