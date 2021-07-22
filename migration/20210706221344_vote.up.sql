@@ -19,7 +19,7 @@ $$
       RETURN NULL;
     END IF;
 
-    UPDATE film set score = (score * ( select count(*) from vote where film = NEW.film ) + NEW.score) / ( select count(*) from vote where film = NEW.film ) + 1 where id = file;
+    UPDATE film set score = (score * ( select count(*) from vote where film = NEW.film ) + NEW.score) / ( select count(*) from vote where film = NEW.film ) + 1 where id = NEW.film;
 
     RETURN NEW;
   END;
