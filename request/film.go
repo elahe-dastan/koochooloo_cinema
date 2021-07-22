@@ -10,3 +10,14 @@ type Film struct {
 	Price          int      `json:"price"`
 	Tags           []string `json:"tags"`
 }
+
+
+//{
+//"file": "gobol",
+//"name": "raha",
+//"producers": ["a", "b"],
+//"production_year": 1373,
+//"explanation": "koochooloo",
+//"price": 20,
+//"tags": ["a", "b"]
+//}
