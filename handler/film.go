@@ -128,10 +128,16 @@ func (f *Film) RetrieveByProducer(c echo.Context) error {
 
 // nolint: wrapcheck
 func (f *Film) Watch(c echo.Context) error {
-	film := c.Param("id")
 	user := c.Param("username")
 
-	result, err := f.Store.Exec("INSERT INTO watch VALUES (?, ?)", film, user)
+	film, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	query := fmt.Sprintf("INSERT INTO watch VALUES (%d, '%s')", film, user)
+
+	result, err := f.Store.Exec(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
