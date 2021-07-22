@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/elahe-dastan/koochooloo_cinema/request"
 	"github.com/elahe-dastan/koochooloo_cinema/response"
+	"github.com/labstack/echo/v4"
 )
 
 type Film struct {
@@ -48,7 +47,7 @@ func (f *Film) Retrieve(c echo.Context) error {
 
 	var films []response.Film
 	query := fmt.Sprintf(
-		"SELECT (id, file, name, production_year, explanation, view, price, score, string_agg(tag, ','), string_agg(producer, ',')) FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film GROUP BY id ORDER BY %s LIMIT %d OFFSET %d ;",
+		"SELECT id, file, name, production_year, explanation, view, price, score, string_agg(tag, ','), string_agg(producer, ',') FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film GROUP BY id ORDER BY %s LIMIT %d OFFSET %d ;",
 		req.Ordering,
 		req.Limit,
 		req.Limit*(req.Page-1),
@@ -61,10 +60,10 @@ func (f *Film) Retrieve(c echo.Context) error {
 
 	for rows.Next() {
 		var film response.Film
-		// todo what about producers and tags need join
 		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score, &film.Tags, &film.Producers); err != nil {
 			panic(err)
 		}
+
 		films = append(films, film)
 	}
 
