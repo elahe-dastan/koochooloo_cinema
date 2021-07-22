@@ -170,14 +170,42 @@ func (a *Admin) Update(c echo.Context) error {
 	//در این قسمت امکان پذیر باشد و در صورت تغییر باید تمام تغییرات rollback شوند
 }
 
+// nolint: wrapcheck
 func (a *Admin) Delete(c echo.Context) error {
-	return nil
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	{
+		query := fmt.Sprintf("DELETE FROM film WHERE id = %d ;", id)
+		if _, err := a.Store.Exec(query); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	{
+		query := fmt.Sprintf("DELETE FROM film_tag WHERE film = %d ;", id)
+		if _, err := a.Store.Exec(query); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	{
+		query := fmt.Sprintf("DELETE FROM film_producer WHERE film = %d ;", id)
+		if _, err := a.Store.Exec(query); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	return c.NoContent(http.StatusOK)
 }
 
 // Register registers the routes of URL handler on given group.
 func (a *Admin) Register(g *echo.Group) {
 	//g.GET("/:username", a.Retrieve)
 	g.POST("/admin", a.Create)
+	g.DELETE("/admin/:id", a.Delete)
 	g.POST("/admin/update/:id", a.Update)
 	//g.GET("/count/:key", h.Count)
 }
