@@ -95,7 +95,8 @@ func (f *Film) RetrieveByName(c echo.Context) error {
 	}
 
 	var films []request.Film
-	rows, err := f.Store.Query("SELECT * FROM film WHERE tag = ? ORDER BY ? DESC LIMIT ? OFFSET ? ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	query := fmt.Sprintf("SELECT * FROM film WHERE tag = '%s' ORDER BY %s DESC LIMIT %d OFFSET %d ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	rows, err := f.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
