@@ -20,6 +20,7 @@ type Admin struct {
 	Store *sql.DB
 }
 
+// nolint: wrapcheck
 func (a *Admin) Create(c echo.Context) error {
 	var film request.Film
 
@@ -29,63 +30,64 @@ func (a *Admin) Create(c echo.Context) error {
 
 	tx, err := a.Store.Begin()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	id := 0
 	query := fmt.Sprintf("INSERT INTO film (file,  name, production_year, explanation, price) VALUES ('%s', '%s', %d, '%s', %d) RETURNING id",
 		film.File, film.Name, film.ProductionYear, film.Explanation, film.Price)
-	err = a.Store.QueryRow(query).Scan(&id)
-	if err != nil {
-		tx.Rollback()
-		return err
+
+	if err := a.Store.QueryRow(query).Scan(&id); err != nil {
+		_ = tx.Rollback()
+
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	// todo this is so bad
 	if film.View != 0 {
 		query = fmt.Sprintf("UPDATE film SET view = %d WHERE id = %d", film.View, id)
+
 		_, err = a.Store.Exec(query)
 		if err != nil {
-			tx.Rollback()
-			return err
-		}
+			_ = tx.Rollback()
 
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
 	}
 
-	// todo this is so bad
 	if film.Price != 0 {
 		query = fmt.Sprintf("UPDATE film SET price = %d WHERE id = %d", film.Price, id)
+
 		_, err = a.Store.Exec(query)
 		if err != nil {
-			tx.Rollback()
-			return err
-		}
+			_ = tx.Rollback()
 
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	for _, producer := range film.Producers {
 		query = fmt.Sprintf("INSERT INTO film_producer (film, producer) VALUES ('%d', '%s')", id, producer)
 		if _, err = a.Store.Exec(query); err != nil {
-			tx.Rollback()
-			return err
+			_ = tx.Rollback()
+
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
 
 	for _, tag := range film.Tags {
 		query = fmt.Sprintf("INSERT INTO film_tag (film, tag) VALUES ('%d', '%s')", id, tag)
 		if _, err = a.Store.Exec(query); err != nil {
-			tx.Rollback()
-			return err
+			_ = tx.Rollback()
+
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	// todo return object
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusCreated)
 }
 
 // Retrieve retrieves URL for given short URL and redirect to it.
 // nolint: wrapcheck
-//todo tag
 func (a *Admin) Retrieve(c echo.Context) error {
 	username := c.Param("username")
 
