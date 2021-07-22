@@ -61,7 +61,7 @@ func (s *SignUp) Retrieve(c echo.Context) error {
 	var user response.User
 	query := fmt.Sprintf("SELECT * FROM users WHERE username = '%s' AND password = '%s'", rq.Username, rq.Password)
 	err := s.Store.QueryRow(query).Scan(&user.Username, &user.Password, &user.FirstName, &user.LastName,
-		&user.Email, &user.Phone, &user.NationalNumber, &user.Score, &user.SpecialTill)
+		&user.Email, &user.Phone, &user.NationalNumber, &user.SpecialTill, &user.Score)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
