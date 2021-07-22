@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/elahe-dastan/koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/response"
 
 	"github.com/labstack/echo/v4"
 )
@@ -52,10 +53,15 @@ func (s *SignUp) Create(c echo.Context) error {
 // Retrieve retrieves URL for given short URL and redirect to it.
 // nolint: wrapcheck
 func (s *SignUp) Retrieve(c echo.Context) error {
-	username := c.Param("username")
+	var rq request.Login
+	if err := c.Bind(&rq); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
 
-	var user request.Signup
-	err := s.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
+	var user response.User
+	query := fmt.Sprintf("SELECT * FROM users WHERE username = '%s' AND password = '%s'", rq.Username, rq.Password)
+	err := s.Store.QueryRow(query).Scan(&user.Username, &user.Password, &user.FirstName, &user.LastName,
+		&user.Email, &user.Phone, &user.NationalNumber, &user.Score, &user.SpecialTill)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
@@ -120,7 +126,7 @@ func (s *SignUp) Update(c echo.Context) error {
 
 // Register registers the routes of URL handler on given group.
 func (s *SignUp) Register(g *echo.Group) {
-	g.GET("/:username", s.Retrieve)
+	g.POST("/login", s.Retrieve)
 	g.POST("/signup", s.Create)
 	g.POST("/edit", s.Update)
 }
