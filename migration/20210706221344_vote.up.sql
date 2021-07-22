@@ -18,7 +18,10 @@ $$
                   AND username = NEW.username) THEN
       RETURN NULL;
     END IF;
-      RETURN NEW;
+
+    UPDATE film set score = (score * ( select count(*) from vote where film = NEW.film ) + NEW.score) / ( select count(*) from vote where film = NEW.film ) + 1 where id = file;
+
+    RETURN NEW;
   END;
 $$
 LANGUAGE 'plpgsql';

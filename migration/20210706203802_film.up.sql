@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS film
     production_year int,
     explanation     varchar(255),
     view            int default 0,
-    price           int DEFAULT 0
+    price           int DEFAULT 0,
+    score           numeric
 )
