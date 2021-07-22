@@ -11,14 +11,9 @@ $$
   BEGIN
     UPDATE users SET score = score + 1 WHERE username = NEW.introducer;
 
-    RETURN NULL;
+    RETURN NEW;
   END;
 $$
 LANGUAGE 'plpgsql';
 
 CREATE TRIGGER introducer_create BEFORE INSERT on introducer FOR EACH ROW EXECUTE PROCEDURE increase_score();
-
-# introducer
-# by score
-# list
-# see other list
