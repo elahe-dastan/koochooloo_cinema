@@ -48,7 +48,7 @@ func (f *Film) Retrieve(c echo.Context) error {
 
 	var films []response.Film
 	query := fmt.Sprintf(
-		"SELECT (id, file, name, production_year, explanation, view, price, score, string_agg(tag, ','), string_agg(producer, ',')) FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film ORDER BY %s LIMIT %d OFFSET %d GROUP BY id",
+		"SELECT (id, file, name, production_year, explanation, view, price, score, string_agg(tag, ','), string_agg(producer, ',')) FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film GROUP BY id ORDER BY %s LIMIT %d OFFSET %d ;",
 		req.Ordering,
 		req.Limit,
 		req.Limit*(req.Page-1),
