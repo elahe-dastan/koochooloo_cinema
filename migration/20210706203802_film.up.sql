@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS film
     explanation     varchar(255),
     view            int default 0,
     price           int DEFAULT 0,
-    score           numeric
+    score           numeric default 0
 )
