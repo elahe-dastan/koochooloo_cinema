@@ -27,24 +27,27 @@ type FilmRequest struct {
 
 const limit = 10
 
+// nolint: wrapcheck
 func (f *Film) Retrieve(c echo.Context) error {
-	filmReq := FilmRequest{}
-	if err := c.Bind(&filmReq); err != nil {
+	var req FilmRequest
+	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	if filmReq.Limit == 0 {
-		filmReq.Limit = limit
+	if req.Limit == 0 {
+		req.Limit = limit
 	}
-	if filmReq.Page == 0 {
-		filmReq.Page = 1
+
+	if req.Page == 0 {
+		req.Page = 1
 	}
-	if filmReq.Ordering == "" {
-		filmReq.Ordering = "id"
+
+	if req.Ordering == "" {
+		req.Ordering = "id"
 	}
 
 	var films []response.Film
-	query := fmt.Sprintf("SELECT * FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film ORDER BY %s LIMIT %d OFFSET %d ;", filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	query := fmt.Sprintf("SELECT * FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film ORDER BY %s LIMIT %d OFFSET %d ;", req.Ordering, req.Limit, req.Limit*(req.Page-1))
 	rows, err := f.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
