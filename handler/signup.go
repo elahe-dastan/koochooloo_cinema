@@ -54,7 +54,7 @@ func (s *SignUp) Create(c echo.Context) error {
 func (s *SignUp) Retrieve(c echo.Context) error {
 	username := c.Param("username")
 
-	user := request.Signup{}
+	var user request.Signup
 	err := s.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -123,5 +123,4 @@ func (s *SignUp) Register(g *echo.Group) {
 	g.GET("/:username", s.Retrieve)
 	g.POST("/signup", s.Create)
 	g.POST("/edit", s.Update)
-	//g.GET("/count/:key", h.Count)
 }
