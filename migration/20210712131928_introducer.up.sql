@@ -15,3 +15,8 @@ $$
 LANGUAGE 'plpgsql';
 
 CREATE TRIGGER introducer_create BEFORE INSERT on introducer FOR EACH ROW EXECUTE PROCEDURE increase_score();
+
+# introducer
+# by score
+# list
+# see other list

@@ -46,11 +46,14 @@ func (v *Vote) Create(c echo.Context) error {
 
 // nolint: wrapcheck
 func (v *Vote) Retrieve(c echo.Context) error {
-	film := c.Param("film")
+	film, err := strconv.Atoi(c.Param("film"))
+	if err != nil {
+		return err
+	}
 
 	var votes request.Vote
-
-	rows, err := v.Store.Query("SELECT * FROM vote WHERE film = ?", film)
+	query := fmt.Sprintf("SELECT * FROM vote WHERE film = %d ;", film)
+	rows, err := v.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -60,8 +63,17 @@ func (v *Vote) Retrieve(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	if err = rows.Scan(votes); err != nil {
-		return err
+
+	var votess []request.Vote
+	var ignoreString string
+	var ignoreInt int
+	for rows.Next() {
+		var vote request.Vote
+		if err = rows.Scan(&ignoreString, &ignoreInt, &vote.Score, &vote.Comment); err != nil {
+			panic(err)
+		}
+
+		votess = append(votess, vote)
 	}
 
 	return c.JSON(http.StatusOK, votes)
