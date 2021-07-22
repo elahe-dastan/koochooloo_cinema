@@ -80,7 +80,7 @@ func (s *Special) UpdateByScore(c echo.Context) error {
 	user := c.Param("user")
 
 	var score int
-	err := s.Store.QueryRow("SELECT score FROM registeration WHERE username = ?", user).Scan(&score)
+	err := s.Store.QueryRow("SELECT score FROM users WHERE username = ?", user).Scan(&score)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (s *Special) UpdateByScore(c echo.Context) error {
 	}
 
 	// This project is not for production or anything but to handle concurrency we did it
-	_, err = tx.Exec("UPDATE registeration SET score = score - ? WHERE user = ?", 3, user)
+	_, err = tx.Exec("UPDATE users SET score = score - ? WHERE user = ?", 3, user)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -105,7 +105,7 @@ func (s *Special) UpdateByScore(c echo.Context) error {
 	//د. در صورت وجود رکورد مرتبط به کاربر در جدول کاربران ویژه،
 	//اگر زمان اشتراک کاربر تمام شده، تا یک ماه بعد تمدید شود و در صورت وجود اشتراک، زمان اشتراک کاربر به
 	//مدت 1 ماه اضافه شود.
-	_, err = tx.Exec("UPDATE registeration SET credit = credit + 1 WHERE username = ?", user)
+	_, err = tx.Exec("UPDATE users SET credit = credit + 1 WHERE username = ?", user)
 	if err != nil {
 		tx.Rollback()
 		return err
