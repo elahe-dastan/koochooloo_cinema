@@ -6,15 +6,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/elahe-dastan/koochooloo_cinema/request"
+	"github.com/labstack/echo/v4"
 )
 
 // todo
 const (
-	//username = "admin"
-	//password = "admin"
+//username = "admin"
+//password = "admin"
 )
 
 type Admin struct {
@@ -44,7 +43,7 @@ func (a *Admin) Create(c echo.Context) error {
 
 	// todo this is so bad
 	if film.View != 0 {
-		query = fmt.Sprintf("UPDATE film SET view = %d WHERE id = %d",film.View, id)
+		query = fmt.Sprintf("UPDATE film SET view = %d WHERE id = %d", film.View, id)
 		_, err = a.Store.Exec(query)
 		if err != nil {
 			tx.Rollback()
@@ -55,7 +54,7 @@ func (a *Admin) Create(c echo.Context) error {
 
 	// todo this is so bad
 	if film.Price != 0 {
-		query = fmt.Sprintf("UPDATE film SET price = %d WHERE id = %d",film.Price, id)
+		query = fmt.Sprintf("UPDATE film SET price = %d WHERE id = %d", film.Price, id)
 		_, err = a.Store.Exec(query)
 		if err != nil {
 			tx.Rollback()
