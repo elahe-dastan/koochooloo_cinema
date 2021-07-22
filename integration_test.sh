@@ -102,3 +102,12 @@ curl http://127.0.0.1:1373/api/film/1/watch/1995parham
 
 echo 'get a movie with id'
 curl http://127.0.0.1:1373/api/film/1
+
+echo 'create vote with 1995parham for the movie'
+curl -X POST http://127.0.0.1:1373/api/comment/1995parham/1 -H 'Content-Type: application/json' -d '{
+  "score": 1,
+  "comment": "Hello World"
+}'
+
+echo 'get a movie with id'
+curl http://127.0.0.1:1373/api/film/1
