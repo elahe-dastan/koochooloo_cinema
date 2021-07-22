@@ -58,7 +58,7 @@ func (f *Film) Retrieve(c echo.Context) error {
 	for rows.Next() {
 		var film response.Film
 		// todo what about producers and tags need join
-		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &ignoreInt, &film.Tags, &ignoreInt, &film.Producers, &film.Score); err != nil {
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score, &ignoreInt, &film.Tags, &ignoreInt, &film.Producers); err != nil {
 			panic(err)
 		}
 		films = append(films, film)
@@ -108,7 +108,7 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 	return c.JSON(http.StatusOK, films)
 }
 
-func (f *Film) RetrieveById(c echo.Context) error {
+func (f *Film) RetrieveByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return err
@@ -119,7 +119,7 @@ func (f *Film) RetrieveById(c echo.Context) error {
 
 	var film response.Film
 	// todo what about producers and tags need join
-	if err = row.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price); err != nil {
+	if err = row.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score); err != nil {
 		panic(err)
 	}
 
@@ -225,6 +225,6 @@ func (f *Film) Register(g *echo.Group) {
 	g.GET("/tag", f.RetrieveByTag)
 	g.GET("/name", f.RetrieveByName)
 	g.GET("/producer", f.RetrieveByProducer)
-	g.GET("/film/:id", f.RetrieveById)
+	g.GET("/film/:id", f.RetrieveByID)
 	g.GET("/film/:id/watch/:username", f.Watch)
 }
