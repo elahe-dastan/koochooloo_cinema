@@ -18,7 +18,9 @@ type Film struct {
 
 type FilmRequest struct {
 	Tag      string `query:"tag"`
-	Limit    int    `query:"name"`
+	Name     string `query:"name"`
+	Producer string `query:"producer"`
+	Limit    int    `query:"limit"`
 	Page     int    `query:"producer"`
 	Ordering string `query:"ordering"`
 }
@@ -94,15 +96,31 @@ func (f *Film) RetrieveByName(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	var films []request.Film
-	query := fmt.Sprintf("SELECT * FROM film WHERE tag = '%s' ORDER BY %s DESC LIMIT %d OFFSET %d ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	if filmReq.Limit == 0 {
+		filmReq.Limit = limit
+	}
+	if filmReq.Page == 0 {
+		filmReq.Page = 1
+	}
+	if filmReq.Ordering == "" {
+		filmReq.Ordering = "id"
+	}
+
+	var films []response.Film
+	query := fmt.Sprintf("SELECT * FROM film WHERE name = '%s' ORDER BY %s DESC LIMIT %d OFFSET %d ;", filmReq.Name, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
 	rows, err := f.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
+	defer rows.Close()
 
-	if err = rows.Scan(&films); err != nil {
-		return err
+	for rows.Next() {
+		var film response.Film
+		// todo what about producers and tags need join
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price); err != nil {
+			panic(err)
+		}
+		films = append(films, film)
 	}
 
 	return c.JSON(http.StatusOK, films)
@@ -114,8 +132,19 @@ func (f *Film) RetrieveByProducer(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
+	if filmReq.Limit == 0 {
+		filmReq.Limit = limit
+	}
+	if filmReq.Page == 0 {
+		filmReq.Page = 1
+	}
+	if filmReq.Ordering == "" {
+		filmReq.Ordering = "id"
+	}
+
 	var films []request.Film
-	rows, err := f.Store.Query("SELECT * FROM film WHERE tag = ? ORDER BY ? LIMIT ? OFFSET ? ;", filmReq.Tag, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	query := fmt.Sprintf("SELECT * FROM film JOIN film_producer ON film.id = film_producer.film WHERE producer = '%s' ORDER BY %s LIMIT %d OFFSET %d ;", filmReq.Producer, filmReq.Ordering, filmReq.Limit, filmReq.Limit*(filmReq.Page-1))
+	rows, err := f.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
@@ -153,6 +182,8 @@ func (f *Film) Watch(c echo.Context) error {
 // Register registers the routes of URL handler on given group.
 func (f *Film) Register(g *echo.Group) {
 	g.GET("/tag", f.RetrieveByTag)
+	g.GET("/name", f.RetrieveByName)
+	g.GET("/producer", f.RetrieveByProducer)
 	g.GET("/film/:id", f.RetrieveById)
 	g.GET("/film/:id/watch/:username", f.Watch)
 }
