@@ -6,18 +6,19 @@ CREATE TABLE IF NOT EXISTS watch
     PRIMARY KEY (film, username),
     FOREIGN KEY (film) REFERENCES film (id),
     FOREIGN KEY (username) REFERENCES users (username)
-)
+);
 
 
 CREATE OR REPLACE FUNCTION pay_for_watch() RETURNS trigger as
 $$
   BEGIN
-    IF (select count(*) from user,film where film.id = NEW.film AND user.credit >= film.price AND username = NEW.username) THEN
+    IF (select count(*) from wallet w,film f where f.id = NEW.film and w.credit >= f.price and w.username = NEW.username) THEN
       UPDATE film SET view = view + 1 WHERE id = NEW.film;
-      UPDATE user SET credit = credit - ( SELECT price FROM film WHERE id = NEW.film ) WHERE username = NEW.username;
+      WITH price AS ( select price FROM film WHERE id = NEW.film )
+      UPDATE wallet SET credit = credit - price WHERE username = NEW.username;
       RETURN NEW;
     END IF;
-      RETURN NULL;
+    RETURN NULL;
   END;
 $$
 LANGUAGE 'plpgsql';
