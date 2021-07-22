@@ -108,23 +108,24 @@ func (f *Film) RetrieveByTag(c echo.Context) error {
 	return c.JSON(http.StatusOK, films)
 }
 
+// nolint: wrapcheck
 func (f *Film) RetrieveByID(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	query := fmt.Sprintf("SELECT * FROM film WHERE id = %d ;", id)
 	row := f.Store.QueryRow(query)
 
 	var film response.Film
-	// todo what about producers and tags need join
-	if err = row.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score); err != nil {
-		panic(err)
+	if err = row.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear,
+		&film.Explanation, &film.View, &film.Price, &film.Score); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	if err = row.Err(); err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, film)
