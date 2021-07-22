@@ -68,7 +68,7 @@ func (f *Film) Retrieve(c echo.Context) error {
 
 	for rows.Next() {
 		var film response.Film
-		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score, &film.Tags, &film.Producers); err != nil {
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score); err != nil {
 			panic(err)
 		}
 
@@ -247,7 +247,7 @@ func (f *Film) Watch(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	query := fmt.Sprintf("INSERT INTO watch VALUES (%d, '%s')", film, user)
+	query := fmt.Sprintf("INSERT INTO watch VALUES (%d, '%s', 1);", film, user)
 
 	result, err := f.Store.Exec(query)
 	if err != nil {

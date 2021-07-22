@@ -46,13 +46,25 @@ func (v *Vote) Create(c echo.Context) error {
 
 // nolint: wrapcheck
 func (v *Vote) Retrieve(c echo.Context) error {
+	var req FilmRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if req.Limit == 0 {
+		req.Limit = limit
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
 	film, err := strconv.Atoi(c.Param("film"))
 	if err != nil {
 		return err
 	}
 
-	var votes request.Vote
-	query := fmt.Sprintf("SELECT * FROM vote WHERE film = %d ;", film)
+	query := fmt.Sprintf("SELECT * FROM vote WHERE film = %d LIMIT %d OFFSET %d;", film, req.Limit, req.Limit*(req.Page-1))
 	rows, err := v.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -64,7 +76,7 @@ func (v *Vote) Retrieve(c echo.Context) error {
 	defer rows.Close()
 
 
-	var votess []request.Vote
+	var votes []request.Vote
 	var ignoreString string
 	var ignoreInt int
 	for rows.Next() {
@@ -73,7 +85,7 @@ func (v *Vote) Retrieve(c echo.Context) error {
 			panic(err)
 		}
 
-		votess = append(votess, vote)
+		votes = append(votes, vote)
 	}
 
 	return c.JSON(http.StatusOK, votes)
