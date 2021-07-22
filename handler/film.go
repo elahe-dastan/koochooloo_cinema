@@ -126,13 +126,18 @@ func (f *Film) RetrieveByProducer(c echo.Context) error {
 	return c.JSON(http.StatusOK, films)
 }
 
+// nolint: wrapcheck
 func (f *Film) Watch(c echo.Context) error {
-	film := c.Param("film_id")
-	user := c.Param("user_id")
+	film := c.Param("id")
+	user := c.Param("username")
 
-	_, err := f.Store.Exec("INSERT INTO watch VALUES (?, ?)", film, user)
+	result, err := f.Store.Exec("INSERT INTO watch VALUES (?, ?)", film, user)
 	if err != nil {
-		return err // increase by one
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if n, _ := result.RowsAffected(); n != 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, "you must pay for this movie")
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -142,7 +147,5 @@ func (f *Film) Watch(c echo.Context) error {
 func (f *Film) Register(g *echo.Group) {
 	g.GET("/tag", f.RetrieveByTag)
 	g.GET("/film/:id", f.RetrieveById)
-	//g.POST("/signup", f.Create)
-	//g.POST("/edit", f.Update)
-	//g.GET("/count/:key", h.Count)
+	g.GET("/film/:id/watch/:username", f.Watch)
 }
