@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/request"
 
 	"github.com/labstack/echo/v4"
 )

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/request"
 
 	"github.com/labstack/echo/v4"
 )

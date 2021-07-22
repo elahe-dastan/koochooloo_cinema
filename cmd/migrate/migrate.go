@@ -1,7 +1,7 @@
 package migrate
 
 import (
-	"koochooloo_cinema/db"
+	"github.com/elahe-dastan/koochooloo_cinema/db"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"

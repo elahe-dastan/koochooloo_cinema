@@ -8,8 +8,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/request"
-	"koochooloo_cinema/response"
+	"github.com/elahe-dastan/koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/response"
 )
 
 type Film struct {

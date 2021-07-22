@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"koochooloo_cinema/cmd/migrate"
-	"koochooloo_cinema/cmd/server"
+	"github.com/elahe-dastan/koochooloo_cinema/cmd/migrate"
+	"github.com/elahe-dastan/koochooloo_cinema/cmd/server"
 )
 
 // ExitFailure status code.
@@ -19,8 +19,8 @@ func Execute() {
 
 	// nolint: exhaustivestruct
 	root := &cobra.Command{
-		Use:   "koochooloo_cinema",
-		Short: "koochooloo_cinema",
+		Use:   "github.com/elahe-dastan/koochooloo_cinema",
+		Short: "github.com/elahe-dastan/koochooloo_cinema",
 	}
 
 	server.Register(root)

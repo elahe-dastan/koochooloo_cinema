@@ -1,6 +1,6 @@
 package main
 
-import "koochooloo_cinema/cmd"
+import "github.com/elahe-dastan/koochooloo_cinema/cmd"
 
 func main() {
 	cmd.Execute()

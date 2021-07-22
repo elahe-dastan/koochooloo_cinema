@@ -8,7 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/request"
 )
 
 // todo

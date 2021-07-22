@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"koochooloo_cinema/db"
-	"koochooloo_cinema/handler"
+	"github.com/elahe-dastan/koochooloo_cinema/db"
+	"github.com/elahe-dastan/koochooloo_cinema/handler"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

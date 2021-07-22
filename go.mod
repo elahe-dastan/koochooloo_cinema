@@ -1,4 +1,4 @@
-module koochooloo_cinema
+module github.com/elahe-dastan/koochooloo_cinema
 
 go 1.15
 
