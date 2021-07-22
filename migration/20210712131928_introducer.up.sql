@@ -10,6 +10,8 @@ CREATE OR REPLACE FUNCTION increase_score() RETURNS trigger as
 $$
   BEGIN
     UPDATE users SET score = score + 1 WHERE username = NEW.introducer;
+
+    RETURN NULL;
   END;
 $$
 LANGUAGE 'plpgsql';

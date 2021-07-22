@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/elahe-dastan/koochooloo_cinema/request"
 	"github.com/elahe-dastan/koochooloo_cinema/response"
-	"github.com/labstack/echo/v4"
 )
 
 type Film struct {
@@ -20,8 +21,9 @@ type FilmRequest struct {
 	Name     string `query:"name"`
 	Producer string `query:"producer"`
 	Limit    int    `query:"limit"`
-	Page     int    `query:"producer"`
+	Page     int    `query:"page"`
 	Ordering string `query:"ordering"`
+	Special  bool   `query:"special"`
 }
 
 const limit = 10
@@ -46,12 +48,18 @@ func (f *Film) Retrieve(c echo.Context) error {
 	}
 
 	var films []response.Film
-	query := fmt.Sprintf(
-		"SELECT id, file, name, production_year, explanation, view, price, score, string_agg(tag, ','), string_agg(producer, ',') FROM film JOIN film_tag ON film.id = film_tag.film JOIN film_producer ON film.id = film_producer.film WHERE price > 0 GROUP BY id ORDER BY %s LIMIT %d OFFSET %d ;",
+	query := "SELECT id, file, name, production_year, explanation, view, price, score FROM film "
+
+	if req.Special {
+		query += "WHERE price > 0"
+	}
+
+	query += fmt.Sprintf("ORDER BY %s LIMIT %d OFFSET %d ;",
 		req.Ordering,
 		req.Limit,
 		req.Limit*(req.Page-1),
 	)
+
 	rows, err := f.Store.Query(query)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -62,6 +70,36 @@ func (f *Film) Retrieve(c echo.Context) error {
 		var film response.Film
 		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score, &film.Tags, &film.Producers); err != nil {
 			panic(err)
+		}
+
+		queryTag := fmt.Sprintf("SELECT tag FROM film_tag WHERE film=%d", film.ID)
+		rowsTag, err := f.Store.Query(queryTag)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		}
+
+		for rowsTag.Next() {
+			var tag string
+			if err = rowsTag.Scan(&tag); err != nil {
+				panic(err)
+			}
+
+			film.Tags = append(film.Tags, tag)
+		}
+
+		queryProducer := fmt.Sprintf("SELECT producer FROM film_producer WHERE film=%d", film.ID)
+		rowsProducer, err := f.Store.Query(queryProducer)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		}
+
+		for rowsProducer.Next() {
+			var producer string
+			if err = rowsProducer.Scan(&producer); err != nil {
+				panic(err)
+			}
+
+			film.Producers = append(film.Producers, producer)
 		}
 
 		films = append(films, film)

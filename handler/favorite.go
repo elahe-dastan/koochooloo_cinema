@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/elahe-dastan/koochooloo_cinema/request"
+	"github.com/elahe-dastan/koochooloo_cinema/response"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -44,6 +46,32 @@ func (f *Favorite) Create(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
+func (f *Favorite) Retrieve(c echo.Context) error {
+	username := c.Param("username")
+	album := c.Param("album")
+
+	query := fmt.Sprintf("SELECT id, file, name, production_year, explanation, view, price, score FROM favorite JOIN film ON favorite.film = film.id WHERE favorite.username='%s' AND favorite.album='%s';", username, album)
+
+	rows, err := f.Store.Query(query)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
+	defer rows.Close()
+
+	var films []response.Film
+	for rows.Next() {
+		var film response.Film
+		if err = rows.Scan(&film.ID, &film.File, &film.Name, &film.ProductionYear, &film.Explanation, &film.View, &film.Price, &film.Score); err != nil {
+			panic(err)
+		}
+
+		films = append(films, film)
+	}
+
+	return c.JSON(http.StatusOK, films)
+}
+
 func (f *Favorite) Register(g *echo.Group) {
 	g.POST("/favorite", f.Create)
+	g.GET("/favorite/:username/:album", f.Retrieve)
 }
