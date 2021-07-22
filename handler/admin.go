@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/elahe-dastan/koochooloo_cinema/request"
@@ -23,7 +24,6 @@ type Admin struct {
 // nolint: wrapcheck
 func (a *Admin) Create(c echo.Context) error {
 	var film request.Film
-
 	if err := c.Bind(&film); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -88,68 +88,62 @@ func (a *Admin) Create(c echo.Context) error {
 
 // Retrieve retrieves URL for given short URL and redirect to it.
 // nolint: wrapcheck
-func (a *Admin) Retrieve(c echo.Context) error {
-	username := c.Param("username")
-
-	user := request.Signup{}
-	err := a.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, err.Error())
-	}
-
-	return c.JSON(http.StatusOK, user)
-}
+//func (a *Admin) Retrieve(c echo.Context) error {
+//	username := c.Param("username")
+//
+//	user := request.Signup{}
+//	err := a.Store.QueryRow("SELECT * FROM registeration WHERE username = ?", username).Scan(&user)
+//	if err != nil {
+//		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+//	}
+//
+//	return c.JSON(http.StatusOK, user)
+//}
 
 func (a *Admin) Update(c echo.Context) error {
-	username := c.Param("username")
-
-	body := request.Signup{}
-	err := c.Bind(&body)
-	if err != nil {
-		return err
+	id := c.Param("id")
+	var body request.Film
+	if err := c.Bind(&body); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	query := "UPDATE registeration SET "
+	query := "UPDATE film SET "
 
 	columns := make(map[string]string)
 
-	if body.Username != "" {
-		columns["username"] = body.Username
+	if body.File != "" {
+		columns["file"] = body.File
 	}
 
-	if body.Password != "" {
-		columns["password"] = body.Password
+	if body.Name != "" {
+		columns["name"] = body.Name
 	}
 
-	if body.FirstName != "" {
-		columns["first_name"] = body.FirstName
+	if body.Explanation != "" {
+		columns["explanation"] = body.Explanation
 	}
 
-	if body.LastName != "" {
-		columns["last_name"] = body.LastName
+	if body.Price != 0 {
+		columns["price"] = strconv.Itoa(body.Price)
 	}
 
-	if body.Email != "" {
-		columns["email"] = body.Email
+	if body.ProductionYear != 0 {
+		columns["production_year"] = strconv.Itoa(body.ProductionYear)
 	}
 
-	if body.Phone != "" {
-		columns["phone"] = body.Phone
-	}
-
-	if body.NationalNumber != "" {
-		columns["national_number"] = body.NationalNumber
+	if body.View != 0 {
+		columns["view"] = strconv.Itoa(body.View)
 	}
 
 	for k, v := range columns {
-		query += k + " = " + v + ", "
+		query += k + " = '" + v + "', "
 	}
 
-	query = strings.Trim(query, ",")
+	query = strings.Trim(query, ", ")
 
-	query += fmt.Sprintf("WHERE username = %s", username)
+	query += fmt.Sprintf(" WHERE id = '%s'", id)
 
-	_, err = a.Store.Query(query)
+	_, err := a.Store.Query(query)
 	if err != nil {
 		return err
 	}
@@ -181,7 +175,8 @@ func (a *Admin) Delete(c echo.Context) error {
 
 // Register registers the routes of URL handler on given group.
 func (a *Admin) Register(g *echo.Group) {
-	g.GET("/:username", a.Retrieve)
+	//g.GET("/:username", a.Retrieve)
 	g.POST("/admin", a.Create)
+	g.POST("/admin/update/:id", a.Update)
 	//g.GET("/count/:key", h.Count)
 }
