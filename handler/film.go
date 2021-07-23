@@ -261,6 +261,40 @@ func (f *Film) Watch(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+func (f *Film) WatchByScore(c echo.Context) error {
+	user := c.Param("username")
+
+	film, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	tx, err := f.Store.Begin()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	query := fmt.Sprintf("INSERT INTO watch_score VALUES (%d, '%s', 1);", film, user)
+
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	query = fmt.Sprintf("UPDATE users SET score = score - 1 WHERE username = '%s'", user)
+
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	tx.Commit()
+
+	return c.NoContent(http.StatusOK)
+}
+
 // Register registers the routes of URL handler on given group.
 func (f *Film) Register(g *echo.Group) {
 	g.GET("/film", f.Retrieve)
@@ -269,4 +303,5 @@ func (f *Film) Register(g *echo.Group) {
 	g.GET("/producer", f.RetrieveByProducer)
 	g.GET("/film/:id", f.RetrieveByID)
 	g.GET("/film/:id/watch/:username", f.Watch)
+	g.GET("/film/watch/score/:id/:username", f.WatchByScore)
 }

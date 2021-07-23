@@ -95,3 +95,7 @@ func (v *Vote) Register(g *echo.Group) {
 	g.POST("/comment/:username/:film", v.Create)
 	g.GET("/comment/:film", v.Retrieve)
 }
+
+//# by score
+//# list
+//# see other list
